@@ -11,7 +11,7 @@ public interface REST {
             "Content-Type: application/json"
     })
     @GET("{params}")
-    Call<JsonObject> listRepos(@Path("params") String params);
+    Call<JsonObject> listRepos(@Path("params") String params, @QueryMap(encoded=true) Map<String, String> filters);
 
 
     @Headers({
@@ -19,6 +19,6 @@ public interface REST {
             "Content-Type: application/json"
     })
     @POST("{params}")
-    Call<JsonObject> updateItem(@Path("params") String params);
+    Call<JsonObject> createUser(@Path("params") String params, @Body HashMap<String, String> rating);
 
 }

@@ -1,5 +1,6 @@
 package com.example.geniusplaza;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.gson.JsonObject;
@@ -24,10 +26,13 @@ import Utils.Callbacks;
 import Utils.User;
 import okhttp3.internal.Util;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
 public class MainActivity extends AppCompatActivity {
 
 
-
+    CallApis Api;
+    MainActivity self = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Intent intent = new Intent(self, CreateActivity.class);
+                startActivity(intent);
 
             }
         });
@@ -85,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
             public void callbackJsonObjectListView(JSONObject body) throws JSONException {
                 ArrayList<User> newUsers = User.fromJson(body.getJSONArray("data"));
                 adapter.addAll(newUsers);
+                if(body.getInt("page") < body.getInt("total_pages")){
+                    Api.get(String.valueOf(body.getInt("page")+1));
+                }
             }
 
             @Override
@@ -92,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        CallApis Api = new CallApis(callbacks);
-        Api.get();
+        Api = new CallApis(callbacks);
+        Api.get("1");
     }
 }
