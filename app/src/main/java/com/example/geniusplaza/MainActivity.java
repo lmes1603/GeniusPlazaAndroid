@@ -5,11 +5,28 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import Utils.CallApis;
+import Utils.Callbacks;
+import Utils.User;
+import okhttp3.internal.Util;
 
 public class MainActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +41,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+
             }
         });
+
+        RenderList();
     }
 
     @Override
@@ -48,5 +69,30 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void RenderList(){
+        // Construct the data source
+        ArrayList<User> arrayOfUsers = new ArrayList<User>();
+        // Create the adapter to convert the array to views
+        final UsersAdapter adapter = new UsersAdapter(this, arrayOfUsers);
+        // Attach the adapter to a ListView
+        ListView listView = (ListView) findViewById(R.id.list_view);
+        listView.setAdapter(adapter);
+
+        Callbacks callbacks = new Callbacks() {
+            @Override
+            public void callbackJsonObjectListView(JSONObject body) throws JSONException {
+                ArrayList<User> newUsers = User.fromJson(body.getJSONArray("data"));
+                adapter.addAll(newUsers);
+            }
+
+            @Override
+            public void callbackError(JSONObject body) {
+
+            }
+        };
+        CallApis Api = new CallApis(callbacks);
+        Api.get();
     }
 }
